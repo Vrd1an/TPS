@@ -10,10 +10,23 @@ class UsulanLokasiController extends Controller
 {
     public function create(C45Service $c45Service)
     {
-        // Check if model is active
-        $modelActive = $c45Service->hasActiveModel();
+        // Check if model is active, if not auto-train model seamlessly
+        if (!$c45Service->hasActiveModel()) {
+            // Auto seed if dataset empty
+            if (empty($c45Service->getTrainingDataset())) {
+                try {
+                    (new \Database\Seeders\DataLatihSeeder())->run();
+                } catch (\Exception $e) {
+                    // Ignore if DB not ready
+                }
+            }
+            // Auto-train C4.5 model
+            $c45Service->trainModel();
+        }
 
+        $modelActive = $c45Service->hasActiveModel();
         $modelInfo = null;
+
         if ($modelActive) {
             $model = $c45Service->getActiveModel();
             $modelInfo = [
@@ -29,12 +42,12 @@ class UsulanLokasiController extends Controller
 
     public function store(Request $request, C45Service $c45Service)
     {
-        // 1. Cek apakah model C4.5 sudah aktif
+        // 1. Cek apakah model C4.5 sudah aktif, jika belum auto-train
         if (!$c45Service->hasActiveModel()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Model C4.5 belum tersedia. Silakan lakukan Training Data Historis terlebih dahulu.',
-            ], 422);
+            if (empty($c45Service->getTrainingDataset())) {
+                try { (new \Database\Seeders\DataLatihSeeder())->run(); } catch (\Exception $e) {}
+            }
+            $c45Service->trainModel();
         }
 
         // 2. Validasi input
