@@ -553,37 +553,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // 4. LOAD TITIK TPS EXISTING DARI QGIS API
+    // 4. MAP PICKER READY (TITIK GRID KLIER)
     // ============================================
-    fetch('/api/qgis/klasifikasi-geojson')
-        .then(res => res.json())
-        .then(geoJson => {
-            L.geoJSON(geoJson, {
-                pointToLayer: function(feature, latlng) {
-                    const status = feature.properties.status;
-                    return L.circleMarker(latlng, {
-                        radius: 6,
-                        fillColor: status === 'layak' ? '#2E7D32' : '#C62828',
-                        color: '#ffffff',
-                        weight: 1.5,
-                        opacity: 0.9,
-                        fillOpacity: 0.7
-                    });
-                },
-                onEachFeature: function(feature, layer) {
-                    const props = feature.properties;
-                    layer.bindPopup(`
-                        <div style="font-family: Inter, sans-serif; min-width: 160px;">
-                            <span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 5px; border-radius: 4px; font-weight: 700;">QGIS Server TPS</span>
-                            <p style="font-weight: 700; margin: 4px 0 2px; font-size: 12px;">${props.name}</p>
-                            <p style="color: #6b7280; font-size: 11px; margin: 0;">Status: <strong style="color:${props.marker_color}">${props.status.toUpperCase()}</strong></p>
-                        </div>
-                    `);
-                }
-            }).addTo(mapPicker);
-        })
-        .catch(err => console.error('QGIS API Fetch Error:', err));
-
 });
 </script>
 @endsection
