@@ -45,6 +45,7 @@ Route::middleware(['session.auth'])->group(function () {
     // Kelola Data Latih Routes (UC-03 Inisialisasi Data Latih)
     Route::get('/data-latih', [DataLatihController::class, 'index'])->name('data-latih');
     Route::post('/data-latih/seed', [DataLatihController::class, 'seed'])->name('data-latih.seed');
+    Route::post('/data-latih/import', [DataLatihController::class, 'import'])->name('data-latih.import');
     Route::post('/data-latih/clear', [DataLatihController::class, 'clear'])->name('data-latih.clear');
     Route::post('/data-latih/train', [DataLatihController::class, 'train'])->name('data-latih.train');
     Route::post('/data-latih', [DataLatihController::class, 'store']);

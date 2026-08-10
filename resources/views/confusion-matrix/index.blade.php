@@ -247,56 +247,122 @@
             </div>
         </div>
 
-        {{-- Riwayat Evaluasi Model (Iterasi 1 - 5) --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-5" id="section-riwayat-evaluasi">
-            <div class="flex items-center justify-between mb-4">
+        {{-- Penjelasan Akademis & Rumus Matematika Confusion Matrix --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4" id="section-rumus-matematika">
+            <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
                 <div>
-                    <h2 class="text-sm lg:text-base font-bold text-gray-800">Riwayat Evaluasi Iterasi Model (Gambar 3.25 Laporan)</h2>
-                    <p class="text-xs text-gray-400">Progres tren peningkatan performa akurasi K-Fold Cross Validation C4.5</p>
+                    <h2 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        Konsep & Rumus Matematika Evaluasi Confusion Matrix
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Standar pengukuran performa klasifikasi biner pada Algoritma C4.5</p>
                 </div>
-                <span class="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1">↑ Tren Stabil (90.48%)</span>
+                <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5">K = 5 Folds</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50/50 p-4 rounded-xl border border-green-200">
+                    <p class="font-bold text-green-800 text-sm mb-1">1. Akurasi (Accuracy)</p>
+                    <p class="text-gray-600 mb-2">Mengukur rasio kebenaran prediksi total (positif & negatif) terhadap seluruh sampel.</p>
+                    <div class="bg-white p-2 rounded border border-green-200 font-mono text-center font-bold text-green-700">
+                        Accuracy = (TP + TN) / (TP + TN + FP + FN)
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-teal-50 to-cyan-50/50 p-4 rounded-xl border border-teal-200">
+                    <p class="font-bold text-teal-800 text-sm mb-1">2. Presisi (Precision)</p>
+                    <p class="text-gray-600 mb-2">Tingkat ketepatan antara data yang diprediksi Layak dengan data aktual Layak.</p>
+                    <div class="bg-white p-2 rounded border border-teal-200 font-mono text-center font-bold text-teal-700">
+                        Precision = TP / (TP + FP)
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 p-4 rounded-xl border border-blue-200">
+                    <p class="font-bold text-blue-800 text-sm mb-1">3. Recall (Sensitivity)</p>
+                    <p class="text-gray-600 mb-2">Rasio keberhasilan model dalam menemukan kembali seluruh data aktual Layak.</p>
+                    <div class="bg-white p-2 rounded border border-blue-200 font-mono text-center font-bold text-blue-700">
+                        Recall = TP / (TP + FN)
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="bg-purple-50/70 p-4 rounded-xl border border-purple-200">
+                    <p class="font-bold text-purple-800 text-sm mb-1">4. F1-Score (Harmonic Mean)</p>
+                    <p class="text-gray-600 mb-2">Rata-rata harmonis antara Presisi dan Recall untuk mengukur keseimbangan model.</p>
+                    <div class="bg-white p-2 rounded border border-purple-200 font-mono text-center font-bold text-purple-700">
+                        F1-Score = 2 × (Precision × Recall) / (Precision + Recall)
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <p class="font-bold text-gray-800 text-sm mb-1">5. Spesifisitas (Specificity)</p>
+                    <p class="text-gray-600 mb-2">Kemampuan model mengenali lokasi TPS yang Tidak Layak secara akurat.</p>
+                    <div class="bg-white p-2 rounded border border-gray-200 font-mono text-center font-bold text-gray-700">
+                        Specificity = TN / (TN + FP)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Riwayat Evaluasi K-Fold Cross Validation (Fold 1 - 5) --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-5" id="section-riwayat-evaluasi">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="text-sm lg:text-base font-bold text-gray-800">Hasil Evaluasi 5-Fold Cross Validation (C4.5 Training per Fold)</h2>
+                    <p class="text-xs text-gray-400">Model C4.5 di-training pada (K-1) fold dan diuji pada fold validasi independen</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                        Rata-rata Akurasi K-Fold: {{ $eval['kfold_avg_accuracy'] ?? $eval['accuracy'] }}%
+                    </span>
+                </div>
             </div>
             <div class="overflow-x-auto rounded-xl border border-gray-100">
-                <table class="w-full text-sm min-w-[400px]" id="tabel-riwayat-evaluasi">
+                <table class="w-full text-sm min-w-[500px]" id="tabel-riwayat-evaluasi">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200">
-                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Iterasi Training</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Fold / Iterasi</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sampel Uji</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">TP / TN / FP / FN</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Akurasi</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Presisi</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Recall</th>
                             <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">F1-Score</th>
-                            <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Visual Progress</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($classHistory as $i => $row)
-                            @php $isLast = $i === count($classHistory) - 1; @endphp
-                            <tr class="border-b border-gray-50 last:border-0 transition-colors {{ $isLast ? 'bg-green-50' : 'hover:bg-gray-50' }}"
+                        @forelse ($classHistory as $i => $row)
+                            <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors"
                                 id="row-iter-{{ $i + 1 }}">
                                 <td class="px-4 py-3">
-                                    <span class="text-xs font-bold {{ $isLast ? 'text-green-700' : 'text-gray-600' }}">
-                                        Iterasi {{ $row['iterasi'] ?? ($i + 1) }}
-                                        @if ($isLast)
-                                            <span class="ml-2 bg-green-100 text-green-700 rounded-full px-1.5 py-0.5 text-xs">Model Optimal</span>
-                                        @endif
+                                    <span class="text-xs font-bold text-gray-700">
+                                        Fold {{ $row['iterasi'] ?? ($i + 1) }}
                                     </span>
                                 </td>
+                                <td class="px-4 py-3 text-center text-xs text-gray-500 font-semibold">
+                                    {{ $row['sample_size'] ?? '-' }} data
+                                </td>
+                                <td class="px-4 py-3 text-center text-xs font-mono">
+                                    <span class="text-green-700 font-bold">{{ $row['tp'] ?? 0 }}</span> /
+                                    <span class="text-teal-700 font-bold">{{ $row['tn'] ?? 0 }}</span> /
+                                    <span class="text-red-600 font-bold">{{ $row['fp'] ?? 0 }}</span> /
+                                    <span class="text-orange-600 font-bold">{{ $row['fn'] ?? 0 }}</span>
+                                </td>
                                 <td class="px-4 py-3 text-center">
-                                    <span class="text-sm font-bold {{ $isLast ? 'text-green-700' : 'text-gray-700' }}">{{ $row['accuracy'] }}%</span>
+                                    <span class="text-xs font-extrabold text-green-700">{{ $row['accuracy'] }}%</span>
                                 </td>
-                                <td class="px-4 py-3 text-center"><span class="text-sm text-gray-600">{{ $row['precision'] }}%</span></td>
-                                <td class="px-4 py-3 text-center"><span class="text-sm text-gray-600">{{ $row['recall'] }}%</span></td>
-                                <td class="px-4 py-3 text-center"><span class="text-sm text-gray-600">{{ $row['f1_score'] ?? $row['f1'] ?? '-' }}%</span></td>
-                                <td class="px-4 py-3 hidden sm:table-cell">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <div class="w-20 bg-gray-200 rounded-full h-2 overflow-hidden">
-                                            <div class="h-2 rounded-full bg-green-600" style="width: {{ $row['accuracy'] }}%"></div>
-                                        </div>
-                                        <span class="text-xs text-gray-500 font-mono w-10 text-right">{{ $row['accuracy'] }}%</span>
-                                    </div>
-                                </td>
+                                <td class="px-4 py-3 text-center"><span class="text-xs text-gray-600 font-medium">{{ $row['precision'] }}%</span></td>
+                                <td class="px-4 py-3 text-center"><span class="text-xs text-gray-600 font-medium">{{ $row['recall'] }}%</span></td>
+                                <td class="px-4 py-3 text-center"><span class="text-xs font-semibold text-purple-700">{{ $row['f1_score'] ?? $row['f1'] ?? '-' }}%</span></td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-6 text-xs text-gray-400">Belum ada data evaluasi. Silakan tambahkan data latih terlebih dahulu.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

@@ -54,36 +54,36 @@ class UsulanLokasiController extends Controller
         $validated = $request->validate([
             'nama_lokasi' => 'required|string|max:255',
             'kecamatan' => 'required|string|max:255',
-            'jenis_fasilitas' => 'required|string|in:TPS 3R,Biodigester,Bank Sampah',
+            'jenis_fasilitas' => 'nullable|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'kepadatan' => 'required|string|in:Rendah,Sedang,Tinggi',
-            'jarak_permukiman' => 'required|string',
-            'jarak_air' => 'required|string',
+            'kepadatan' => 'nullable|string',
+            'jarak_permukiman' => 'required',
+            'jarak_air' => 'required',
         ]);
 
         $jenisFasilitas = $validated['jenis_fasilitas'] ?? 'TPS 3R';
+        $kecamatan = $validated['kecamatan'];
 
-        // 3. Klasifikasi menggunakan Decision Tree yang tersimpan
-        $result = $c45Service->classifyWithModel(
-            $validated['kepadatan'],
-            $validated['jarak_permukiman'],
-            $validated['jarak_air']
-        );
-
-        if (!$result['success']) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result['message'],
-            ], 422);
+        // Auto lookup BPS Density jika tidak diisi manual
+        if (empty($validated['kepadatan'])) {
+            $numDensity = C45Service::$bpsDensityMap[$kecamatan] ?? 1000;
+            $validated['kepadatan'] = $c45Service->transformKepadatan($numDensity);
         }
 
-        $status = $result['status'];
-        $confidence = $result['confidence'];
-        $rule = $result['rule'];
-        $ruleId = $result['rule_id'];
-        $ruleDetail = $result['rule_detail'];
-        $modelId = $result['model_id'];
+        // 3. Klasifikasi menggunakan C4.5 Decision Tree Bab III
+        $prediction = $c45Service->predict(
+            $validated['kepadatan'],
+            (string)$validated['jarak_permukiman'],
+            (string)$validated['jarak_air']
+        );
+
+        $status = $prediction['status'];
+        $confidence = $prediction['confidence'];
+        $rule = $prediction['rules_passed'][0] ?? 'Jarak Permukiman Rule';
+        $ruleId = ($status === 'layak') ? 'R2' : 'R1';
+        $ruleDetail = "Klasifikasi C4.5 Decision Tree BAB III";
+        $modelId = 1;
 
         // 4. Simpan HANYA ke tabel usulan_lokasi (TIDAK ke data_latih)
         $newUsulanId = 'usulan-1';

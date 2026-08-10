@@ -197,6 +197,74 @@
                 </div>
             </div>
 
+            {{-- Tabel Dataset Data Latih Hasil Pelatihan --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" id="section-dataset-table">
+                <div class="border-b border-gray-100 px-5 py-4 bg-gray-50/50 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>
+                        </svg>
+                        Tabel Dataset Data Latih Hasil Pelatihan ({{ count($dataset ?? []) }} Fasilitas)
+                    </h2>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">Format fasilitas ps - Copy.xlsx</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm min-w-[700px]">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase">
+                                <th class="text-left px-4 py-3">NO</th>
+                                <th class="text-left px-4 py-3">Nama BANK SAMPAH / FASILITAS</th>
+                                <th class="text-left px-4 py-3">KATEGORI FASILITAS</th>
+                                <th class="text-left px-4 py-3">ALAMAT</th>
+                                <th class="text-center px-4 py-3">KEPADATAN</th>
+                                <th class="text-center px-4 py-3">JARAK PERMUKIMAN</th>
+                                <th class="text-center px-4 py-3">JARAK SUMBER AIR</th>
+                                <th class="text-center px-4 py-3">STATUS KELAYAKAN</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse(($dataset ?? []) as $index => $row)
+                                @php
+                                    $statusLbl = strtolower($row['status'] ?? 'layak') === 'layak' ? 'Layak' : 'Tidak Layak';
+                                    $jenisFas = $row['jenis_fasilitas'] ?? 'TPS 3R';
+                                    $badgeColor = match($jenisFas) {
+                                        'Biodigester' => 'bg-sky-100 text-sky-700 border-sky-200',
+                                        'Bank Sampah' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                        default => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                    };
+                                @endphp
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-4 py-3 text-xs text-gray-400 font-medium">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-3">
+                                        <p class="font-semibold text-gray-800 text-xs sm:text-sm">{{ $row['nama_fasilitas'] ?? '' }}</p>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="inline-block px-2.5 py-0.5 text-xs font-bold border rounded-full {{ $badgeColor }}">{{ $jenisFas }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs text-gray-500">{{ $row['alamat_desa'] ?? '' }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <x-badge type="kepadatan" :value="$row['kepadatan'] ?? 'Sedang'" />
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <x-badge type="jarak" :value="$row['jarak_permukiman'] ?? 'Sedang'" />
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <x-badge type="jarak" :value="$row['jarak_air'] ?? 'Sedang'" />
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <x-badge type="label" :value="$statusLbl" />
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-8 text-gray-400 text-xs">Belum ada data latih.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             {{-- Metadata --}}
             <div class="bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-500 flex flex-wrap gap-4">
                 <span>🕒 Training: {{ $model['trained_at'] ? \Carbon\Carbon::parse($model['trained_at'])->format('d M Y, H:i:s') : '-' }}</span>

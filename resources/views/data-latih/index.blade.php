@@ -92,27 +92,14 @@
                 </button>
             </form>
 
-            {{-- Tombol Inisialisasi Data Latih (UC-03: Database Seeder) --}}
-            <form action="{{ route('data-latih.seed') }}" method="POST" class="inline">
-                @csrf
-                <button type="submit"
-                        onclick="return confirm('Inisialisasi dataset historis TPS Cianjur ke basis data MySQL?');"
-                        class="flex items-center gap-1.5 text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg px-3.5 py-2 hover:bg-teal-100 transition-colors shadow-sm"
-                        id="btn-seed-data">
-                    <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>
-                    </svg>
-                    Import Data Historis
-                </button>
-            </form>
-
-            <button x-data x-on:click="$dispatch('open-modal-tambah')"
-                    class="flex items-center gap-1.5 text-xs font-semibold text-white bg-green-700 hover:bg-green-800 rounded-lg px-3.5 py-2 shadow-sm transition-colors"
-                    id="btn-tambah-data">
-                <svg class="w-[13px] h-[13px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            {{-- Tombol Import Data Excel --}}
+            <button @click="$dispatch('open-modal-import')"
+                    class="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 hover:bg-emerald-200 rounded-lg px-3.5 py-2 transition-colors shadow-sm"
+                    id="btn-import-excel">
+                <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/>
                 </svg>
-                Tambah Data
+                Import Data Excel
             </button>
         </x-slot:actions>
     </x-topbar>
@@ -125,6 +112,15 @@
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/>
                 </svg>
                 <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-4 flex items-center gap-3 shadow-sm">
+                <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span>{{ session('error') }}</span>
             </div>
         @endif
 
@@ -311,29 +307,35 @@
 
         {{-- Table --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" id="tabel-data-latih">
+            <div class="border-b border-gray-100 px-5 py-3.5 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Data Mentah Historis (64 Fasilitas Pengelola Sampah DLH Cianjur)</span>
+                    <span class="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                        Dataset Mentah
+                    </span>
+                </div>
+                <p class="text-[11px] text-gray-500">💡 Klik <strong class="text-emerald-700">Pembentukan Model C4.5</strong> di atas untuk mengeksekusi tahapan KDD (Selection, Preprocessing, Transformation, Rules & C4.5).</p>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-sm min-w-[640px]">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200">
-                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">No</th>
-                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Fasilitas TPS</th>
-                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Jenis Fasilitas</th>
-                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Alamat / Desa</th>
-                            <th class="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Kepadatan</th>
-                            <th class="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Jarak Permukiman</th>
-                            <th class="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Jarak Sumber Air</th>
-                            <th class="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Label Target</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">NO</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Nama BANK SAMPAH / FASILITAS</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">KATEGORI FASILITAS</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">ALAMAT</th>
                             <th class="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($dataLatih as $index => $row)
                             @php
-                                $statusLbl = strtolower($row['status'] ?? $row['label'] ?? 'layak') === 'layak' ? 'Layak' : 'Tidak Layak';
                                 $jenisFas = $row['jenis_fasilitas'] ?? 'TPS 3R';
                                 $badgeColor = match($jenisFas) {
                                     'Biodigester' => 'bg-sky-100 text-sky-700 border-sky-200',
                                     'Bank Sampah' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                    'Rumah Kompos' => 'bg-purple-100 text-purple-700 border-purple-200',
                                     default => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                 };
                             @endphp
@@ -347,18 +349,6 @@
                                 </td>
                                 <td class="px-4 py-3 text-xs text-gray-500">{{ $row['alamat_desa'] ?? $row['kecamatan'] ?? '' }}</td>
                                 <td class="px-4 py-3 text-center">
-                                    <x-badge type="kepadatan" :value="$row['kepadatan']" />
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <x-badge type="jarak" :value="$row['jarak_permukiman']" />
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <x-badge type="jarak" :value="$row['jarak_air']" />
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <x-badge type="label" :value="$statusLbl" />
-                                </td>
-                                <td class="px-4 py-3 text-center">
                                     <form action="{{ url('/data-latih/' . ($row['id'] ?? $index)) }}" method="POST" onsubmit="return confirm('Hapus baris data latih ini?');">
                                         @csrf
                                         @method('DELETE')
@@ -370,7 +360,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-12 text-gray-400">Belum ada data latih terdaftar. Klik Import Data Historis di atas.</td>
+                                <td colspan="5" class="text-center py-12 text-gray-400">Belum ada data mentah terdaftar. Klik Import Data Historis di atas.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -395,6 +385,58 @@
                id="btn-buat-usulan">
                 Buat Usulan Lokasi →
             </a>
+        </div>
+    </div>
+
+    {{-- Modal Import Data Excel --}}
+    <div x-data="{ open: false }"
+         x-on:open-modal-import.window="open = true"
+         x-show="open"
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-lg w-full p-6 space-y-5" @click.away="open = false">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-800">Import Data Latih (Excel / CSV)</h3>
+                        <p class="text-xs text-gray-500">Format sesuai dataset gabungan TPS Cianjur</p>
+                    </div>
+                </div>
+                <button @click="open = false" class="text-gray-400 hover:text-gray-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <form action="{{ route('data-latih.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-gray-700">Pilih File Excel / CSV dari Komputer (.xlsx, .xls, .csv)</label>
+                    <input type="file" name="excel_file" required accept=".xlsx,.xls,.csv"
+                           class="w-full text-xs text-gray-500 border border-gray-200 rounded-xl p-2.5 bg-gray-50 focus:outline-none focus:border-emerald-500">
+                    <p class="text-[11px] text-gray-400">Sistem mendukung file Excel seperti <code class="bg-gray-100 px-1 py-0.5 rounded text-emerald-700 font-bold">fasilitas ps - Copy.xlsx</code> maupun dataset TPS DLH Cianjur lainnya.</p>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-100">
+                    <button type="button" @click="open = false" class="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-emerald-700 rounded-xl hover:bg-emerald-800 shadow-md transition-colors flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Proses Import Data
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
