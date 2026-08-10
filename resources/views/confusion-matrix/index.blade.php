@@ -50,6 +50,20 @@
 
     <div class="px-4 lg:px-8 py-5 space-y-5">
 
+        @if ($total == 0)
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 lg:p-5 flex items-center gap-3" id="empty-data-alert">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-amber-900">Data Latih Kosong / Model Belum Dilatih</h3>
+                    <p class="text-xs text-amber-700 mt-0.5">Belum ada data latih untuk diuji pada Confusion Matrix. Silakan buka menu <a href="{{ route('data-latih') }}" class="font-bold underline text-amber-900 hover:text-amber-800">Kelola Data Latih</a> untuk mengisi data dan klik <strong>"⚡ Pembentukan Model C4.5"</strong>.</p>
+                </div>
+            </div>
+        @endif
+
         {{-- Metric Cards --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" id="metric-cards-matrix">
             @foreach ($metricCards as $i => $card)
