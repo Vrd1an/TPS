@@ -12,10 +12,13 @@ class HasilKlasifikasiController extends Controller
     {
         $locations = $this->safeDb(function() {
             $usulan = DB::table('usulan_lokasi')->get()->map(function($loc) {
+                $status = $loc->status ?? 'menunggu_klasifikasi';
+                $isPending = ($status === 'menunggu_klasifikasi');
+
                 return [
                     'id' => 'usulan-' . $loc->id,
                     'name' => $loc->nama,
-                    'status' => $loc->status,
+                    'status' => $status,
                     'kecamatan' => $loc->kecamatan,
                     'jenis_fasilitas' => $loc->jenis_fasilitas ?? 'TPS 3R',
                     'lat' => (float)$loc->latitude,
@@ -23,10 +26,10 @@ class HasilKlasifikasiController extends Controller
                     'kepadatan' => $loc->kepadatan,
                     'jarak_permukiman' => $loc->jarak_permukiman,
                     'jarak_air' => $loc->jarak_air,
-                    'rule' => $loc->rule,
+                    'rule' => $isPending ? 'Menunggu Proses Klasifikasi Admin DLH' : ($loc->rule ?? 'Pohon Keputusan C4.5'),
                     'rule_id' => $loc->rule_id ?? null,
-                    'rule_detail' => $loc->rule_detail ?? $loc->rule,
-                    'confidence' => $loc->confidence,
+                    'rule_detail' => $isPending ? 'Usulan Baru — Belum Diklasifikasikan' : ($loc->rule_detail ?? $loc->rule),
+                    'confidence' => $isPending ? 'Pending' : ($loc->confidence ?? '90%'),
                     'predicted_at' => $loc->predicted_at ?? $loc->created_at,
                     'source' => 'usulan',
                 ];
@@ -56,24 +59,29 @@ class HasilKlasifikasiController extends Controller
             return array_merge($usulan, $latih);
         }, function() use ($c45Service) {
             $mockUsulan = session('mock_usulan_lokasi', []);
-            $usulan = array_map(fn($loc) => [
-                'id' => 'usulan-' . ($loc['id'] ?? rand(100, 999)),
-                'name' => $loc['nama'] ?? 'Usulan TPS',
-                'status' => $loc['status'] ?? 'layak',
-                'kecamatan' => $loc['kecamatan'] ?? 'Cianjur',
-                'jenis_fasilitas' => $loc['jenis_fasilitas'] ?? 'TPS 3R',
-                'lat' => (float)($loc['latitude'] ?? 0),
-                'lng' => (float)($loc['longitude'] ?? 0),
-                'kepadatan' => $loc['kepadatan'] ?? 'Sedang',
-                'jarak_permukiman' => $loc['jarak_permukiman'] ?? 'Sedang',
-                'jarak_air' => $loc['jarak_air'] ?? 'Sedang',
-                'rule' => $loc['rule'] ?? '',
-                'rule_id' => $loc['rule_id'] ?? null,
-                'rule_detail' => $loc['rule_detail'] ?? ($loc['rule'] ?? ''),
-                'confidence' => $loc['confidence'] ?? '90.0%',
-                'predicted_at' => $loc['predicted_at'] ?? ($loc['created_at'] ?? null),
-                'source' => 'usulan',
-            ], $mockUsulan);
+            $usulan = array_map(function($loc) {
+                $status = $loc['status'] ?? 'menunggu_klasifikasi';
+                $isPending = ($status === 'menunggu_klasifikasi');
+
+                return [
+                    'id' => 'usulan-' . ($loc['id'] ?? rand(100, 999)),
+                    'name' => $loc['nama'] ?? 'Usulan TPS',
+                    'status' => $status,
+                    'kecamatan' => $loc['kecamatan'] ?? 'Cianjur',
+                    'jenis_fasilitas' => $loc['jenis_fasilitas'] ?? 'TPS 3R',
+                    'lat' => (float)($loc['latitude'] ?? 0),
+                    'lng' => (float)($loc['longitude'] ?? 0),
+                    'kepadatan' => $loc['kepadatan'] ?? 'Sedang',
+                    'jarak_permukiman' => $loc['jarak_permukiman'] ?? 'Sedang',
+                    'jarak_air' => $loc['jarak_air'] ?? 'Sedang',
+                    'rule' => $isPending ? 'Menunggu Proses Klasifikasi Admin DLH' : ($loc['rule'] ?? ''),
+                    'rule_id' => $loc['rule_id'] ?? null,
+                    'rule_detail' => $isPending ? 'Usulan Baru — Belum Diklasifikasikan' : ($loc['rule_detail'] ?? ($loc['rule'] ?? '')),
+                    'confidence' => $isPending ? 'Pending' : ($loc['confidence'] ?? '90.0%'),
+                    'predicted_at' => $loc['predicted_at'] ?? ($loc['created_at'] ?? null),
+                    'source' => 'usulan',
+                ];
+            }, $mockUsulan);
 
             $dataset = $c45Service->getTrainingDataset();
             $latih = array_map(function($item) {

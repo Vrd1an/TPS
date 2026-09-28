@@ -28,24 +28,28 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'password' => 'required|string|min:6',
+            'role' => 'nullable|string|in:admin,petugas',
         ]);
+
+        $role = $validated['role'] ?? 'petugas';
 
         $exists = DB::table('users')->where('email', $validated['email'])->exists();
         if ($exists) {
             return redirect()->back()->withErrors(['email' => 'Email pengguna sudah terdaftar di sistem.']);
         }
 
-        $this->safeDb(function() use ($validated) {
+        $this->safeDb(function() use ($validated, $role) {
             DB::table('users')->insert([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
+                'role' => $role,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }, function() {});
 
-        return redirect()->route('kelola-pengguna')->with('success', 'Petugas DLH baru berhasil ditambahkan.');
+        return redirect()->route('kelola-pengguna')->with('success', 'Akun ' . ($role === 'admin' ? 'Administrator' : 'Petugas') . ' baru berhasil ditambahkan.');
     }
 
     public function destroy($id)

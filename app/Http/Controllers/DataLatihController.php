@@ -239,10 +239,9 @@ class DataLatihController extends Controller
             }
 
             if ($lat == 0 || $lng == 0) {
-                $baseLat = -6.82 + (($i % 10) * 0.015);
-                $baseLng = 107.14 + ((floor($i / 10) % 10) * 0.015);
-                $lat = round($baseLat, 8);
-                $lng = round($baseLng, 8);
+                $coords = $this->resolveGeographicalCoordinates($nama, $alamat, $i);
+                $lat = $coords[0];
+                $lng = $coords[1];
             }
 
             if ($hasExplicitCriteria) {
@@ -466,5 +465,111 @@ class DataLatihController extends Controller
         });
 
         return redirect()->route('data-latih')->with('success', 'Data latih berhasil dihapus. Model C4.5 perlu di-training ulang.');
+    }
+
+    /**
+     * Helper: Menentukan koordinat akurat berdasarkan nama desa/kecamatan di Cianjur
+     */
+    protected function resolveGeographicalCoordinates(string $nama, string $alamat, int $index = 1): array
+    {
+        $villageCoordinates = [
+            'Sukaratu' => [-6.8295, 107.2912],
+            'Sukarama' => [-6.8354, 107.2845],
+            'Kemang' => [-6.8180, 107.3021],
+            'Jatisari' => [-6.8220, 107.2880],
+            'Jati' => [-6.8410, 107.2990],
+            'Bojongpicung' => [-6.8250, 107.2950],
+            'Bojong Picung' => [-6.8250, 107.2950],
+            'Sawahgede' => [-6.8190, 107.1350],
+            'Muka' => [-6.8120, 107.1420],
+            'Sayang' => [-6.8310, 107.1490],
+            'Babakankaret' => [-6.7980, 107.1320],
+            'Babakan karet' => [-6.7980, 107.1320],
+            'Limbangansari' => [-6.8050, 107.1250],
+            'Salagedang' => [-6.8480, 107.2650],
+            'Girimulya' => [-6.8620, 107.2820],
+            'Sukamanah' => [-6.8590, 107.2710],
+            'Peuteuycondong' => [-6.8410, 107.2580],
+            'Peuteuy condong' => [-6.8410, 107.2580],
+            'Karangnunggal' => [-6.8720, 107.2910],
+            'Cikondang' => [-6.8850, 107.2850],
+            'Cihaur' => [-6.8530, 107.2780],
+            'Cibuluh' => [-7.3820, 107.4210],
+            'Gelarpawitan' => [-7.3750, 107.4420],
+            'Gelarwangi' => [-7.3880, 107.4510],
+            'Jayapura' => [-7.3980, 107.4350],
+            'Neglasari' => [-6.6780, 107.1580],
+            'Mentengsari' => [-6.6920, 107.1720],
+            'Sinargalih' => [-6.8768, 107.2412],
+            'Sindangjaya' => [-6.7020, 107.0390],
+            'Gunungsari' => [-6.7890, 107.3120],
+            'Kertajaya' => [-6.7974, 107.3047],
+            'Benjot' => [-6.7790, 107.0910],
+            'Cijedil' => [-6.7850, 107.1050],
+            'Gekbrong' => [-6.8390, 107.0720],
+            'Mekarwangi' => [-6.7950, 107.3280],
+            'Kertamukti' => [-6.8080, 107.3420],
+            'Cipeuyeum' => [-6.8010, 107.3390],
+            'Cipeuyem' => [-6.8010, 107.3390],
+            'Cihea' => [-6.8150, 107.3480],
+            'Haurwangi' => [-6.8020, 107.3350],
+            'Kertasari' => [-6.7920, 107.3450],
+            'Kadupandak' => [-7.1650, 107.0750],
+            'Sindang Asih' => [-6.8250, 107.1920],
+            'Sukajadi' => [-6.8220, 107.1850],
+            'Sirnasari' => [-7.3850, 107.0250],
+            'Bobojong' => [-6.7450, 107.1880],
+            'Mande' => [-6.7580, 107.1950],
+            'Cikidangbayabang' => [-6.7650, 107.2080],
+            'Ciherang' => [-6.7380, 107.0920],
+            'Sukanagalih' => [-6.7490, 107.0810],
+            'Saganten' => [-7.4320, 107.1180],
+            'Babakansari' => [-6.8140, 107.2410],
+            'Babakan Sari' => [-6.8150, 107.2420],
+            'Sukaluyu' => [-6.8100, 107.2350],
+            'Sukaresmi' => [-6.7150, 107.0750],
+            'Sukajaya' => [-7.2150, 107.1050],
+            'Ciwalen' => [-6.8520, 107.0890],
+        ];
+
+        $combinedText = $nama . ' ' . $alamat;
+        foreach ($villageCoordinates as $village => $coords) {
+            if (stripos($combinedText, $village) !== false) {
+                $jitterLat = ((($index * 7) % 7) - 3) * 0.001;
+                $jitterLng = ((($index * 13) % 7) - 3) * 0.001;
+                return [round($coords[0] + $jitterLat, 8), round($coords[1] + $jitterLng, 8)];
+            }
+        }
+
+        $kecamatanCoords = [
+            'Cianjur' => [-6.8150, 107.1380], 'Ciranjang' => [-6.7974, 107.3047],
+            'Cilaku' => [-6.8768, 107.2412], 'Cibeber' => [-6.8534, 107.2780],
+            'Karangtengah' => [-6.8220, 107.1850], 'Cipanas' => [-6.7020, 107.0390],
+            'Pacet' => [-6.7450, 107.0850], 'Cugenang' => [-6.7820, 107.0980],
+            'Gekbrong' => [-6.8390, 107.0720], 'Warungkondang' => [-6.8520, 107.0890],
+            'Mande' => [-6.7580, 107.1950], 'Sukaluyu' => [-6.8100, 107.2350],
+            'Bojongpicung' => [-6.8250, 107.2950], 'Haurwangi' => [-6.8020, 107.3350],
+            'Cikalongkulon' => [-6.6850, 107.1650], 'Sukaresmi' => [-6.7150, 107.0750],
+            'Campaka' => [-6.9550, 107.1450], 'Campaka Mulya' => [-6.9950, 107.1150],
+            'Sukanagara' => [-7.0750, 107.1350], 'Pagelaran' => [-7.1250, 107.1850],
+            'Kadupandak' => [-7.1650, 107.0750], 'Takokak' => [-7.0550, 106.9950],
+            'Tanggeung' => [-7.2150, 107.1050], 'Cijati' => [-7.2650, 107.0450],
+            'Cikadu' => [-7.2850, 107.2250], 'Cibinong' => [-7.3150, 107.1350],
+            'Pasirkuda' => [-7.2350, 107.1950], 'Sindangbarang' => [-7.4250, 107.1250],
+            'Agrabinta' => [-7.4550, 106.9450], 'Leles' => [-7.3850, 107.0250],
+            'Cidaun' => [-7.3923, 107.4349], 'Naringgul' => [-7.3350, 107.3550],
+        ];
+
+        foreach ($kecamatanCoords as $kec => $coords) {
+            if (stripos($combinedText, $kec) !== false) {
+                $jitterLat = ((($index * 7) % 11) - 5) * 0.003;
+                $jitterLng = ((($index * 13) % 11) - 5) * 0.003;
+                return [round($coords[0] + $jitterLat, 8), round($coords[1] + $jitterLng, 8)];
+            }
+        }
+
+        $jitterLat = ((($index * 5) % 13) - 6) * 0.005;
+        $jitterLng = ((($index * 11) % 13) - 6) * 0.005;
+        return [round(-6.8150 + $jitterLat, 8), round(107.1380 + $jitterLng, 8)];
     }
 }

@@ -28,3 +28,9 @@ Thumbs.db
 *.rar
 *.zip
 
+# Non-TPS files / Audio & SFX
+converted_audio/
+*.bnk
+*.wem
+*.mp3
+*.wav

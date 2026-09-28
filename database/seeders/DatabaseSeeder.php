@@ -14,24 +14,50 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Seed Administrator & Petugas DLH users
-        if (!DB::table('users')->where('email', 'admin@dlh.cianjurkab.go.id')->exists()) {
-            DB::table('users')->insert([
+        $usersToSeed = [
+            [
+                'name' => 'Admin Dinas DLH',
+                'email' => 'admin@cianjurkab.go.id',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ],
+            [
                 'name' => 'Administrator DLH',
                 'email' => 'admin@dlh.cianjurkab.go.id',
                 'password' => Hash::make('password123'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        if (!DB::table('users')->where('email', 'petugas@dlh.cianjurkab.go.id')->exists()) {
-            DB::table('users')->insert([
+                'role' => 'admin',
+            ],
+            [
                 'name' => 'Petugas Lapangan DLH',
+                'email' => 'petugas@cianjurkab.go.id',
+                'password' => Hash::make('petugas123'),
+                'role' => 'petugas',
+            ],
+            [
+                'name' => 'Petugas DLH Cianjur',
                 'email' => 'petugas@dlh.cianjurkab.go.id',
                 'password' => Hash::make('password123'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+                'role' => 'petugas',
+            ],
+        ];
+
+        foreach ($usersToSeed as $userData) {
+            $user = DB::table('users')->where('email', $userData['email'])->first();
+            if (!$user) {
+                DB::table('users')->insert([
+                    'name' => $userData['name'],
+                    'email' => $userData['email'],
+                    'password' => $userData['password'],
+                    'role' => $userData['role'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table('users')->where('email', $userData['email'])->update([
+                    'role' => $userData['role'],
+                    'password' => $userData['password'],
+                ]);
+            }
         }
 
         // Seed 21 Data Latih Historis

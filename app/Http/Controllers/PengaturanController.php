@@ -35,7 +35,10 @@ class PengaturanController extends Controller
             'admin_agency' => 'required|string|max:255',
         ]);
 
-        session(['settings' => $validated]);
+        session([
+            'settings' => $validated,
+            'user_name' => $validated['admin_name']
+        ]);
 
         return redirect()->back()->with('success', 'Pengaturan berhasil disimpan.');
     }

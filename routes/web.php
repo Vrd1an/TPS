@@ -39,32 +39,48 @@ Route::middleware(['session.auth'])->group(function () {
         return redirect('/dashboard');
     });
 
-    // Dashboard Route
+    // Dashboard Route (Adaptive for Admin & Petugas)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Kelola Data Latih Routes (UC-03 Inisialisasi Data Latih)
-    Route::get('/data-latih', [DataLatihController::class, 'index'])->name('data-latih');
-    Route::post('/data-latih/seed', [DataLatihController::class, 'seed'])->name('data-latih.seed');
-    Route::post('/data-latih/import', [DataLatihController::class, 'import'])->name('data-latih.import');
-    Route::post('/data-latih/clear', [DataLatihController::class, 'clear'])->name('data-latih.clear');
-    Route::post('/data-latih/train', [DataLatihController::class, 'train'])->name('data-latih.train');
-    Route::post('/data-latih', [DataLatihController::class, 'store']);
-    Route::delete('/data-latih/{id}', [DataLatihController::class, 'destroy']);
-
-    // Decision Tree Visualization Route
-    Route::get('/decision-tree', [DecisionTreeController::class, 'index'])->name('decision-tree');
-
-    // Usulan Lokasi Routes (UC-04 & UC-05)
+    // Usulan Lokasi Routes (Shared for Input & List)
     Route::get('/usulan-lokasi', [UsulanLokasiController::class, 'create'])->name('usulan-lokasi');
-    Route::post('/usulan-lokasi', [UsulanLokasiController::class, 'store']);
+    Route::post('/usulan-lokasi', [UsulanLokasiController::class, 'store'])->name('usulan-lokasi.store');
 
-    // Hasil Klasifikasi Map Route (UC-06 Hit API QGIS & Peta)
+    // Hasil Klasifikasi Map Route (Shared View)
     Route::get('/hasil-klasifikasi', [HasilKlasifikasiController::class, 'index'])->name('hasil-klasifikasi');
 
-    // Confusion Matrix Route (UC-07 Uji Confusion Matrix & K-Fold)
-    Route::get('/confusion-matrix', [ConfusionMatrixController::class, 'index'])->name('confusion-matrix');
-
-// Settings Routes
+    // Settings Routes (Shared)
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
-    Route::post('/pengaturan', [PengaturanController::class, 'update']);
+    Route::post('/pengaturan', [PengaturanController::class, 'update'])->name('pengaturan.update');
+
+    // ============================================================
+    // KHUSUS ROLE: ADMINISTRATOR DLH
+    // ============================================================
+    Route::middleware(['role:admin'])->group(function () {
+        // Eksekusi Klasifikasi C4.5 pada Usulan Lokasi
+        Route::post('/usulan-lokasi/{id}/klasifikasi', [UsulanLokasiController::class, 'klasifikasi'])->name('usulan-lokasi.klasifikasi');
+        Route::post('/usulan-lokasi/klasifikasi-semua', [UsulanLokasiController::class, 'klasifikasiSemua'])->name('usulan-lokasi.klasifikasi-semua');
+        Route::delete('/usulan-lokasi/{id}', [UsulanLokasiController::class, 'destroy'])->name('usulan-lokasi.destroy');
+
+        // Kelola Data Latih Routes (UC-03 Inisialisasi Data Latih)
+        Route::get('/data-latih', [DataLatihController::class, 'index'])->name('data-latih');
+        Route::post('/data-latih/seed', [DataLatihController::class, 'seed'])->name('data-latih.seed');
+        Route::post('/data-latih/import', [DataLatihController::class, 'import'])->name('data-latih.import');
+        Route::post('/data-latih/clear', [DataLatihController::class, 'clear'])->name('data-latih.clear');
+        Route::post('/data-latih/train', [DataLatihController::class, 'train'])->name('data-latih.train');
+        Route::post('/data-latih', [DataLatihController::class, 'store']);
+        Route::delete('/data-latih/{id}', [DataLatihController::class, 'destroy']);
+
+        // Decision Tree Visualization Route
+        Route::get('/decision-tree', [DecisionTreeController::class, 'index'])->name('decision-tree');
+
+        // Confusion Matrix Route (UC-07 Uji Confusion Matrix & K-Fold)
+        Route::get('/confusion-matrix', [ConfusionMatrixController::class, 'index'])->name('confusion-matrix');
+
+        // Kelola Pengguna Route (UC-02)
+        Route::get('/kelola-pengguna', [\App\Http\Controllers\UserController::class, 'index'])->name('kelola-pengguna');
+        Route::post('/kelola-pengguna', [\App\Http\Controllers\UserController::class, 'store']);
+        Route::delete('/kelola-pengguna/{id}', [\App\Http\Controllers\UserController::class, 'destroy']);
+    });
 });
+
