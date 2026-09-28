@@ -1,0 +1,16 @@
+/vendor
+.env
+.env.*
+tests/
+node_modules/
+*.docx
+*.xlsx
+*.csv
+*.sql
+*.png
+*.log
+converted_audio/
+*.bnk
+*.wem
+*.mp3
+*.wav
